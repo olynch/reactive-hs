@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds #-}
+
 module Main (main) where
 
 import Data.ByteString.Lazy.Char8 (pack)
@@ -5,7 +7,7 @@ import MyLib
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 
-ex1 :: Tm Bool
+ex1 :: Tm TB
 ex1 = produce $ do
   let x = Const 1
   let y = Const 2

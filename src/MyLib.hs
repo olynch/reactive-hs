@@ -1,24 +1,28 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 
 module MyLib where
 
 import Control.Monad.State (MonadState (get), State, evalState, modify)
 import Control.Monad.Trans.Class
+import Data.Kind (Type)
 
 newtype V = MkV Int
   deriving (Eq, Show)
 
 type ℝ = Double
 
-data Tm a where
+data Tp = TR | TB
+
+data Tm :: Tp -> Type where
   Var :: V -> Tm a
-  Const :: ℝ -> Tm ℝ
-  Add :: Tm ℝ -> Tm ℝ -> Tm ℝ
-  Sub :: Tm ℝ -> Tm ℝ -> Tm ℝ
-  If :: Tm Bool -> Tm a -> Tm a -> Tm aa
-  TTrue :: Tm Bool
-  TFalse :: Tm Bool
-  Eq :: Tm a -> Tm a -> Tm Bool
+  Const :: ℝ -> Tm TR
+  Add :: Tm TR -> Tm TR -> Tm TR
+  Sub :: Tm TR -> Tm TR -> Tm TR
+  If :: Tm TB -> Tm a -> Tm a -> Tm aa
+  TTrue :: Tm TB
+  TFalse :: Tm TB
+  Eq :: Tm a -> Tm a -> Tm TB
   Let :: V -> Tm a -> Tm b -> Tm b
 
 instance Show (Tm a) where
