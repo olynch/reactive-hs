@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 
-module MyLib where
+module Take1 where
 
 import Control.Monad.State (MonadState (get), State, evalState, modify)
 import Control.Monad.Trans.Class
@@ -10,13 +10,15 @@ import Data.Kind (Type)
 newtype V = MkV Int
   deriving (Eq, Show)
 
-type ℝ = Double
+data Tp = TR | TB | TTuple [Tp]
 
-data Tp = TR | TB
+data TupleOf :: [Tp] -> Type where
+  Mt :: TupleOf '[]
+  Cons :: Tm t -> TupleOf ts -> TupleOf (t : ts)
 
 data Tm :: Tp -> Type where
   Var :: V -> Tm a
-  Const :: ℝ -> Tm TR
+  Const :: Double -> Tm TR
   Add :: Tm TR -> Tm TR -> Tm TR
   Sub :: Tm TR -> Tm TR -> Tm TR
   If :: Tm TB -> Tm a -> Tm a -> Tm aa
@@ -24,6 +26,7 @@ data Tm :: Tp -> Type where
   TFalse :: Tm TB
   Eq :: Tm a -> Tm a -> Tm TB
   Let :: V -> Tm a -> Tm b -> Tm b
+  MkTuple :: TupleOf xs -> Tm (TTuple xs)
 
 instance Show (Tm a) where
   show (Var (MkV i)) = "#" ++ show i
@@ -35,6 +38,11 @@ instance Show (Tm a) where
   show TFalse = "false"
   show (Eq t1 t2) = "(" ++ show t1 ++ " == " ++ show t2 ++ ")"
   show (Let v t body) = "let " ++ show (Var v) ++ " = " ++ show t ++ " in " ++ show body
+  show (MkTuple t) = "[" ++ elems t ++ "]"
+    where
+      elems :: TupleOf ts -> String
+      elems Mt = ""
+      elems (Cons x xs) = show x ++ ", " ++ elems xs
 
 newtype Staged m a = MkStaged {callCC :: forall s. (a -> m (Tm s)) -> m (Tm s)}
   deriving (Functor)
